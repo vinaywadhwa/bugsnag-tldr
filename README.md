@@ -94,8 +94,8 @@ Then add to your MCP config:
 - **In Foreground:** True 100%
 - **Network Access:** cellular 72% | wifi 26% | none 1%
 
-## Stack Traces (2 distinct)
-### Variant 1 (24x) CheckoutActivity
+## Stack Traces (2 distinct, from 30 sampled events)
+### Variant 1 (80% of sample) CheckoutActivity
 **Exception: java.lang.IllegalStateException**
 > Failed to process payment checkout
 
@@ -123,7 +123,7 @@ Then add to your MCP config:
   `14:08:14` [request] OkHttp call succeeded (method=POST, url=https://api.example.com/v2/promo/validate, duration=340)
   `14:08:30` [request] OkHttp call failed (method=POST, url=https://api.example.com/v2/payments/charge, duration=16105)
 
-### Variant 2 (6x) CheckoutActivity
+### Variant 2 (20% of sample) CheckoutActivity
 **Exception: java.lang.IllegalStateException**
 > Failed to process payment checkout
 

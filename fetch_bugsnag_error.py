@@ -271,6 +271,7 @@ def format_error_summary(error, event, pivots, distinct_traces):
         lines.append("")
 
     # Stack traces with breadcrumbs per variant
+    total_sampled = sum(d["count"] for d in distinct_traces.values())
     if len(distinct_traces) == 1:
         sig, data = list(distinct_traces.items())[0]
         ev = data["event"]
@@ -280,12 +281,13 @@ def format_error_summary(error, event, pivots, distinct_traces):
         if bc_samples:
             lines.append(format_breadcrumb_samples(bc_samples))
     elif len(distinct_traces) > 1:
-        lines.append(f"## Stack Traces ({len(distinct_traces)} distinct)")
+        lines.append(f"## Stack Traces ({len(distinct_traces)} distinct, from {total_sampled} sampled events)")
         for i, (sig, data) in enumerate(distinct_traces.items(), 1):
             count = data["count"]
+            pct = count * 100 // total_sampled if total_sampled else 0
             ev = data["event"]
             ctx = ev.get("context", "")
-            lines.append(f"### Variant {i} ({count}x) {ctx}")
+            lines.append(f"### Variant {i} ({pct}% of sample) {ctx}")
             lines.append(format_stacktrace(ev.get("exceptions", []), max_frames=8))
             bc_samples = data.get("breadcrumb_samples", [])
             if bc_samples:
@@ -324,7 +326,7 @@ def format_error_summary(error, event, pivots, distinct_traces):
     return "\n".join(lines)
 
 
-def fetch_distinct_traces(project_id, error_id, token, sample_size=30, max_breadcrumb_samples=5):
+def fetch_distinct_traces(project_id, error_id, token, sample_size=100, max_breadcrumb_samples=5):
     """Fetch events and group by distinct stack trace patterns, keeping multiple breadcrumb samples."""
     events = api_get(
         f"/projects/{project_id}/errors/{error_id}/events?per_page={sample_size}&full_reports=true",
