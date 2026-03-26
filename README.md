@@ -62,6 +62,7 @@ Then add to your MCP config:
 **Input:**
 - `error_url` (required): A Bugsnag error URL (eg: `https://app.bugsnag.com/org/project/errors/abc123`)
 - `breadcrumb_paths` (optional): Max distinct breadcrumb paths per trace variant. Default `5`, or `all`
+- `samples` (optional): Number of events to sample for trace variant analysis. Default `100`. Higher values give more accurate variant percentages but take longer (the Bugsnag API returns 30 events per page, so `samples: 150` means 5 API calls).
 
 **Output:** Markdown summary including:
 - Error class and message
@@ -94,7 +95,7 @@ Then add to your MCP config:
 - **In Foreground:** True 100%
 - **Network Access:** cellular 72% | wifi 26% | none 1%
 
-## Stack Traces (2 distinct, from 30 sampled events)
+## Stack Traces (2 distinct, from 100 sampled events)
 ### Variant 1 (80% of sample) CheckoutActivity
 **Exception: java.lang.IllegalStateException**
 > Failed to process payment checkout
@@ -152,4 +153,7 @@ The Python script also works standalone:
 
 ```bash
 BUGSNAG_API_KEY=xxx python3 fetch_bugsnag_error.py https://app.bugsnag.com/org/project/errors/abc123
+
+# With options
+BUGSNAG_API_KEY=xxx python3 fetch_bugsnag_error.py <url> -s 200 -b all
 ```
