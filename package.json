@@ -1,0 +1,32 @@
+{
+  "name": "bugsnag-tldr",
+  "version": "1.0.0",
+  "description": "MCP server that condenses Bugsnag errors into actionable summaries — stack traces, breadcrumbs, breakdowns, and metadata",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "bugsnag-tldr": "index.js"
+  },
+  "files": [
+    "index.js",
+    "fetch_bugsnag_error.py"
+  ],
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4"
+  },
+  "keywords": [
+    "mcp",
+    "bugsnag",
+    "error-tracking",
+    "model-context-protocol",
+    "claude"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vinaywadhwa/bugsnag-tldr"
+  }
+}
