@@ -44,6 +44,32 @@ def api_get(path, token):
         raise RuntimeError(f"Bugsnag API {e.code} on {path}: {body}")
 
 
+def api_get_paginated(path, token, max_items=100):
+    """Fetch multiple pages from the Bugsnag API up to max_items."""
+    url = f"{API_BASE}{path}"
+    all_items = []
+    while url and len(all_items) < max_items:
+        req = Request(url, headers={"Authorization": f"token {token}"})
+        try:
+            with urlopen(req) as resp:
+                all_items.extend(json.loads(resp.read()))
+                link = resp.headers.get("Link", "")
+                url = _parse_next_link(link)
+        except HTTPError as e:
+            body = e.read().decode() if e.fp else ""
+            raise RuntimeError(f"Bugsnag API {e.code}: {body}")
+    return all_items[:max_items]
+
+
+def _parse_next_link(link_header):
+    """Extract the 'next' URL from a Link header."""
+    for part in link_header.split(","):
+        if 'rel="next"' in part:
+            url = part.split(";")[0].strip().strip("<>")
+            return url
+    return None
+
+
 def parse_bugsnag_url(url):
     """Parse org slug, project slug, and error ID from a Bugsnag URL."""
     m = re.match(r"https?://app\.bugsnag\.com/([^/]+)/([^/]+)/errors/([a-f0-9]+)", url)
@@ -328,9 +354,10 @@ def format_error_summary(error, event, pivots, distinct_traces):
 
 def fetch_distinct_traces(project_id, error_id, token, sample_size=100, max_breadcrumb_samples=5):
     """Fetch events and group by distinct stack trace patterns, keeping multiple breadcrumb samples."""
-    events = api_get(
-        f"/projects/{project_id}/errors/{error_id}/events?per_page={sample_size}&full_reports=true",
-        token
+    events = api_get_paginated(
+        f"/projects/{project_id}/errors/{error_id}/events?per_page=30&full_reports=true",
+        token,
+        max_items=sample_size,
     )
 
     traces = {}
