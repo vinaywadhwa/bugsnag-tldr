@@ -43,6 +43,11 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
             description:
               "Max distinct breadcrumb paths per trace variant (default: '5', or 'all')",
           },
+          samples: {
+            type: "number",
+            description:
+              "Number of events to sample for trace variant analysis (default: 100). Higher values give more accurate variant percentages but take longer.",
+          },
         },
         required: ["error_url"],
       },
@@ -68,6 +73,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const scriptArgs = [FETCH_BUGSNAG_SCRIPT, args.error_url];
   if (args.breadcrumb_paths) {
     scriptArgs.push("-b", String(args.breadcrumb_paths));
+  }
+  if (args.samples) {
+    scriptArgs.push("-s", String(args.samples));
   }
 
   try {

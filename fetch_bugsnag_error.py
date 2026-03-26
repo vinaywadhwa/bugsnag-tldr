@@ -389,6 +389,8 @@ def main():
     parser.add_argument("--project-id", help="Project ID (required with --error-id)")
     parser.add_argument("-b", "--breadcrumbs", default="5",
                         help="Max distinct breadcrumb paths per trace variant (default: 5, or 'all')")
+    parser.add_argument("-s", "--samples", type=int, default=100,
+                        help="Number of events to sample for trace variant analysis (default: 100)")
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
 
@@ -427,7 +429,7 @@ def main():
         pivots = []
 
     max_bc = None if args.breadcrumbs.lower() == "all" else int(args.breadcrumbs)
-    distinct_traces = fetch_distinct_traces(project_id, error_id, token, max_breadcrumb_samples=max_bc)
+    distinct_traces = fetch_distinct_traces(project_id, error_id, token, sample_size=args.samples, max_breadcrumb_samples=max_bc)
 
     output = format_error_summary(error, event, pivots, distinct_traces)
     print(output)
